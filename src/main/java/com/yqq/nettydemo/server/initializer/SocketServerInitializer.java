@@ -21,6 +21,7 @@ public class SocketServerInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeline = socketChannel.pipeline();
+
         pipeline.addLast(new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE , 0 , 4
                 , 0 , 4));
         pipeline.addLast(new LengthFieldPrepender(4));
