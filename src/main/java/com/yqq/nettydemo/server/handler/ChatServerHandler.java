@@ -26,7 +26,7 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<String> {
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         System.out.println(ctx.channel().remoteAddress() + "已连接");
         for (Channel channel : channels){
-            channel.writeAndFlush("【服务器】" + ctx.channel().remoteAddress() + "已上线\n");
+            channel.writeAndFlush("【客户端】" + ctx.channel().remoteAddress() + "已上线\n");
         }
         channels.add(ctx.channel());
         System.out.println("当前在线人数——" + channels.size());
