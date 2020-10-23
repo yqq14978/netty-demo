@@ -50,6 +50,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, HttpObject httpObject) throws Exception {
+        System.out.println("channelRead0接收消息");
         if(httpObject instanceof HttpRequest){
             ByteBuf buffer = Unpooled.copiedBuffer("hello world!" , CharsetUtil.UTF_8);
             FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
@@ -57,5 +58,22 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
             channelHandlerContext.writeAndFlush(response);
         }
+    }
+
+//    @Override
+//    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+//        System.out.println("channelRead0接收消息");
+//        if(msg instanceof HttpRequest){
+//            ByteBuf buffer = Unpooled.copiedBuffer("hello world!" , CharsetUtil.UTF_8);
+//            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
+//            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
+//            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
+//            ctx.writeAndFlush(response);
+//        }
+//    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelReadComplete");
     }
 }
