@@ -24,9 +24,9 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-        System.out.println(ctx.channel().remoteAddress() + "已连接");
+        System.out.println(ctx.channel().remoteAddress() + "：已连接");
         for (Channel channel : channels){
-            channel.writeAndFlush("【客户端】" + ctx.channel().remoteAddress() + "已上线\n");
+            channel.writeAndFlush("【客户端】" + ctx.channel().remoteAddress() + "：已上线\n");
         }
         channels.add(ctx.channel());
         System.out.println("当前在线人数——" + channels.size());
@@ -36,14 +36,15 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) throws Exception {
-        for (Channel context : channels){
+        for (Channel channel : channels){
             String sender = "";
-            if(channelHandlerContext.channel().remoteAddress().equals(context.remoteAddress())){
+            if(channelHandlerContext.channel().remoteAddress().equals(channel.remoteAddress())){
                 sender = "自己";
             }else {
                 sender = channelHandlerContext.channel().remoteAddress().toString();
             }
-            context.writeAndFlush(sender + ":" + s);
+            channel.writeAndFlush("【客户端】" + sender + "：" + s + "\n");
+            System.out.println("消息接收方——" + channel.remoteAddress());
         }
     }
 
@@ -54,9 +55,15 @@ public class ChatServerHandler extends SimpleChannelInboundHandler<String> {
             if(channels.get(i).remoteAddress().equals(ctx.channel().remoteAddress())){
                 index = i;
             }else {
-                channels.get(i).writeAndFlush(ctx.channel().remoteAddress() + "已下线");
+                channels.get(i).writeAndFlush("【客户端】" + ctx.channel().remoteAddress() + "：已下线\n");
             }
         }
         channels.remove(index);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
     }
 }
