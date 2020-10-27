@@ -1,11 +1,8 @@
 package com.yqq.nettydemo.server.handler;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
-import io.netty.util.CharsetUtil;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 /**
  * Created with IDEA
@@ -14,15 +11,21 @@ import io.netty.util.CharsetUtil;
  * @Date:2020/10/26
  * @Time:11:23
  */
-public class WebSocketServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, HttpObject httpObject) throws Exception {
-        if(httpObject instanceof HttpRequest){
-            ByteBuf buffer = Unpooled.copiedBuffer("hello world!" , CharsetUtil.UTF_8);
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
-            channelHandlerContext.writeAndFlush(response);
-        }
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
+        System.out.println("收到消息：" + textWebSocketFrame.text());
+
+        channelHandlerContext.channel().writeAndFlush(new TextWebSocketFrame("当前时间：" + System.currentTimeMillis()));
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("建立连接：" + ctx.channel().id().asLongText());
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("连接断开：" + ctx.channel().id().asLongText());
     }
 }
