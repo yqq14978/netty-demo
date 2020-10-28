@@ -42,4 +42,11 @@ public class HeartBeatServerHandler extends ChannelInboundHandlerAdapter {
 //        System.out.println("来自客户端的消息：" + msg);
 //        ctx.writeAndFlush("啊吧啊吧");
 //    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
 }

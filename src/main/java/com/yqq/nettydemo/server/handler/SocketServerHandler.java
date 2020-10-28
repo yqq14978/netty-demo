@@ -17,4 +17,10 @@ public class SocketServerHandler extends SimpleChannelInboundHandler<String> {
         System.out.println("来自客户端的消息：" + s);
         channelHandlerContext.writeAndFlush("歪比巴卜");
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
 }

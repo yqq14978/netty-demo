@@ -76,4 +76,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         System.out.println("channelReadComplete");
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
 }

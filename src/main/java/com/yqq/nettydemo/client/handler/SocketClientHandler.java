@@ -22,4 +22,10 @@ public class SocketClientHandler extends SimpleChannelInboundHandler<String> {
         System.out.println("来自服务端的消息：" + s);
         channelHandlerContext.channel().writeAndFlush("啊吧啊吧");
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
 }

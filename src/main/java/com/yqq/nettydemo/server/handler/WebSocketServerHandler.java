@@ -28,4 +28,10 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<TextWebS
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         System.out.println("连接断开：" + ctx.channel().id().asLongText());
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
 }
