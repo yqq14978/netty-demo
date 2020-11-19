@@ -20,4 +20,4 @@
 2.TThreadPoolServer - 多线程服务模型，使用标准的阻塞式IO  
 3.TNonblockingServer - 多线程服务模型，使用非阻塞IO（需使用TFramedTransport数据传输方式）  
 4.THsHaServer - 引入了线程池去处理，其模型将读写任务放到线程池去处理；Half-sync/Half-async（半同步/半异步）的处理方式，半异步是处理IO事件，半同步是用于handler对rpc的同步处理
- 
+  
