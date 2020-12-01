@@ -28,6 +28,7 @@ public class Acceptor implements Runnable {
         try {
             SocketChannel socketChannel = serverSocketChannel.accept();
             if(null != socketChannel){
+                //连接成功后注册写事件
                 new ReadHandler(selector , socketChannel);
             }
         } catch (IOException e) {

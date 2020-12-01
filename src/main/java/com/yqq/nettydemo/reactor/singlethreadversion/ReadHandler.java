@@ -27,7 +27,9 @@ public class ReadHandler implements Runnable {
         this.selector = selector;
         this.socketChannel = socketChannel;
         socketChannel.configureBlocking(false);
+        //监听写事件
         selectionKey = socketChannel.register(selector , SelectionKey.OP_READ , this);
+        //事件完成后唤醒阻塞的selector.select()方法
         selector.wakeup();
     }
 

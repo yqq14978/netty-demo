@@ -20,6 +20,7 @@ public class WriteHandler implements Runnable {
     public WriteHandler(SelectionKey selectionKey) {
         this.selectionKey = selectionKey;
         selectionKey.attach(this);
+        //注册写事件
         selectionKey.interestOps(SelectionKey.OP_WRITE);
     }
 
