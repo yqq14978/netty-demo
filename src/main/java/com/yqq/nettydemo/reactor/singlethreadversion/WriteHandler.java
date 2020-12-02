@@ -3,6 +3,7 @@ package com.yqq.nettydemo.reactor.singlethreadversion;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -14,10 +15,12 @@ import java.nio.channels.SocketChannel;
  */
 public class WriteHandler implements Runnable {
 
+    private final Selector selector;
     private final SelectionKey selectionKey;
     private ByteBuffer buffer = ByteBuffer.allocate(1024);
 
-    public WriteHandler(SelectionKey selectionKey) {
+    public WriteHandler(Selector selector , SelectionKey selectionKey) {
+        this.selector = selector;
         this.selectionKey = selectionKey;
         selectionKey.attach(this);
         //注册写事件
@@ -33,9 +36,10 @@ public class WriteHandler implements Runnable {
             buffer.flip();
             socketChannel.write(buffer);
             System.out.println("执行写入操作完成");
+            selectionKey.interestOps(SelectionKey.OP_READ);
+            selectionKey.attach(new ReadHandler(selector , socketChannel));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        selectionKey.cancel();
     }
 }

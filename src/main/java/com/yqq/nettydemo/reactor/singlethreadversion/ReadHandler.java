@@ -41,7 +41,7 @@ public class ReadHandler implements Runnable {
             //进行业务操作
             process();
             //业务操作完成后进行写事件的监听
-            new WriteHandler(selectionKey);
+            new WriteHandler(selector , selectionKey);
         } catch (IOException e) {
             e.printStackTrace();
         }
