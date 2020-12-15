@@ -2,9 +2,7 @@ package com.yqq.nettydemo.server;
 
 import com.yqq.nettydemo.server.initializer.FileServerInitalizer;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
@@ -27,9 +25,7 @@ public class FileServer {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup , workerGroup).channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new FileServerInitalizer())
-                    //使用池化的直接缓存
-                    .childOption(ChannelOption.ALLOCATOR , new PooledByteBufAllocator());
+                    .childHandler(new FileServerInitalizer());
 
             ChannelFuture future = serverBootstrap.bind(8899).sync();
             future.channel().closeFuture().sync();
