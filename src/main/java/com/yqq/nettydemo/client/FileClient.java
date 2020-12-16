@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IDEA
@@ -35,7 +37,7 @@ public class FileClient {
             for(;;){
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                 String filePath = bufferedReader.readLine();
-                File file = new File(filePath);
+                sendFileWithHttp(filePath);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -44,6 +46,16 @@ public class FileClient {
         } finally {
             workerGroup.shutdownGracefully();
         }
+    }
+
+    private static void sendFileWithHttp(String filePath) {
+        File file = new File(filePath);
+        if(!file.exists()){
+            System.out.println("文件不存在");
+            return;
+        }
+        Map headers = new HashMap<>();
+        headers.put("file" , file);
     }
 
 }
