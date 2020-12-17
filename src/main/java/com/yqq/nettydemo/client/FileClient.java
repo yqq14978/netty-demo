@@ -2,9 +2,15 @@ package com.yqq.nettydemo.client;
 
 import com.yqq.nettydemo.client.initializer.FileClientInitalizer;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
 import io.netty.handler.logging.LoggingHandler;
 
 import java.io.BufferedReader;
@@ -33,29 +39,40 @@ public class FileClient {
                     .handler(new LoggingHandler()).handler(new FileClientInitalizer());
 
             ChannelFuture future = bootstrap.connect(new InetSocketAddress("localhost" , 8899)).sync();
-            future.channel().closeFuture().sync();
+//            future.channel().closeFuture().sync();
             for(;;){
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                 String filePath = bufferedReader.readLine();
-                sendFileWithHttp(filePath);
+                sendFileWithHttp(filePath , "localhost:8899" , future.channel());
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (HttpPostRequestEncoder.ErrorDataEncoderException e) {
             e.printStackTrace();
         } finally {
             workerGroup.shutdownGracefully();
         }
     }
 
-    private static void sendFileWithHttp(String filePath) {
+    private static void sendFileWithHttp(String filePath , String uri , Channel channel) throws HttpPostRequestEncoder.ErrorDataEncoderException {
         File file = new File(filePath);
         if(!file.exists()){
             System.out.println("文件不存在");
             return;
         }
-        Map headers = new HashMap<>();
-        headers.put("file" , file);
+//        Map headers = new HashMap<>();
+//        headers.put("file" , file);
+        String[] filePaths = filePath.split("/");
+        String fileName = filePaths[filePaths.length - 1];
+        HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
+        HttpPostRequestEncoder postRequestEncoder = new HttpPostRequestEncoder(request , true);
+        postRequestEncoder.addBodyFileUpload("file" , fileName , file , "application/octet-stream" , false);
+        postRequestEncoder.finalizeRequest();
+        channel.write(request);
+        channel.write(postRequestEncoder);
+        channel.flush();
     }
 
 }
