@@ -6,6 +6,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
@@ -35,7 +36,7 @@ public class FileClient {
 
         try {
             Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(workerGroup).channel(NioServerSocketChannel.class)
+            bootstrap.group(workerGroup).channel(NioSocketChannel.class)
                     .handler(new LoggingHandler()).handler(new FileClientInitalizer());
 
             ChannelFuture future = bootstrap.connect(new InetSocketAddress("localhost" , 8899)).sync();
@@ -57,6 +58,8 @@ public class FileClient {
     }
 
     private static void sendFileWithHttp(String filePath , String uri , Channel channel) throws HttpPostRequestEncoder.ErrorDataEncoderException {
+        //D:\others\configserver\config\application.properties
+        System.out.println("准备传输文件：" + channel.remoteAddress());
         File file = new File(filePath);
         if(!file.exists()){
             System.out.println("文件不存在");

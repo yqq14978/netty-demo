@@ -26,6 +26,21 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private HttpPostRequestDecoder postRequestDecoder;
 
     @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("客户端已连接：" + ctx.channel().remoteAddress());
+    }
+
+    @Override
+    public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("handler已加入：" + ctx.channel().remoteAddress());
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("客户端事件触发：" + ctx.channel().remoteAddress());
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
         //因为大文件需要进行分块传输所以第一次传输过来的会是request对象，后续的会是每一个数据块，需要使用HttpContent对象来处理
         if(msg instanceof HttpRequest){
