@@ -59,6 +59,7 @@ public class FileClient {
 
     private static void sendFileWithHttp(String filePath , String uri , Channel channel) throws HttpPostRequestEncoder.ErrorDataEncoderException {
         //D:\others\configserver\config\application.properties
+        //F:\developTools\proj\netty-demo\clientFiles\16-9.mp4
         System.out.println("准备传输文件：" + channel.remoteAddress());
         File file = new File(filePath);
         if(!file.exists()){
