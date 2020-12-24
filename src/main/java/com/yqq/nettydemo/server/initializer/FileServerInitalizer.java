@@ -23,8 +23,8 @@ public class FileServerInitalizer extends ChannelInitializer<SocketChannel> {
         ChannelPipeline channelPipeline = ch.pipeline();
 
         channelPipeline.addLast(new HttpServerCodec());
-        channelPipeline.addLast(new HttpContentCompressor());
+//        channelPipeline.addLast(new HttpContentCompressor());
         channelPipeline.addLast(new ChunkedWriteHandler());
-        channelPipeline.addLast(new FileServerHandler());
+        channelPipeline.addLast("handler" , new FileServerHandler());
     }
 }

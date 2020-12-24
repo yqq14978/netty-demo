@@ -19,9 +19,11 @@ public class FileClientInitalizer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
+        //解码器和编码器
         pipeline.addLast(new HttpClientCodec());
-        pipeline.addLast(new HttpContentCompressor());
+        //解压
+//        pipeline.addLast(new HttpContentCompressor());
         pipeline.addLast(new ChunkedWriteHandler());
-        pipeline.addLast(new FileClientHandler());
+        pipeline.addLast("handler" , new FileClientHandler());
     }
 }

@@ -32,7 +32,8 @@ public class ChatClient {
 
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             for (; ;){
-                channel.writeAndFlush(bufferedReader.readLine() + "\r\n");
+                ChannelFuture future = channel.writeAndFlush(bufferedReader.readLine() + "\r\n");
+                System.out.println(future.await().isDone());
             }
 
         }finally {

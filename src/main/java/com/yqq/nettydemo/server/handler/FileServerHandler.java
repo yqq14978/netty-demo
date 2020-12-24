@@ -1,11 +1,14 @@
 package com.yqq.nettydemo.server.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.util.CharsetUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +44,13 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     }
 
     @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("客户端断开连接：" + ctx.channel().remoteAddress());
+    }
+
+    @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
+        System.out.println("服务端读事件触发");
         //因为大文件需要进行分块传输所以第一次传输过来的会是request对象，后续的会是每一个数据块，需要使用HttpContent对象来处理
         if(msg instanceof HttpRequest){
             request = (HttpRequest) msg;
@@ -49,6 +58,11 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             if(HttpMethod.POST.equals(request.method())){
                 postRequestDecoder = new HttpPostRequestDecoder(request);
             }
+            ByteBuf buffer = Unpooled.copiedBuffer("已接收到文件上传请求" , CharsetUtil.UTF_8);
+            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
+            ctx.writeAndFlush(response);
         } else
             //对后续的数据块进行处理
             if (msg instanceof HttpContent && postRequestDecoder != null){
