@@ -5,15 +5,14 @@ import com.yqq.nettydemo.client.initializer.FileClientInitalizer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPromise;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.DefaultHttpRequest;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.multipart.HttpPostRequestEncoder;
+import io.netty.handler.codec.http2.Http2CodecUtil;
 import io.netty.handler.logging.LoggingHandler;
 
 import java.io.BufferedReader;
@@ -32,38 +31,19 @@ import java.util.Map;
  * @Time:15:41
  */
 public class FileClient {
-    ChannelFuture channelFuture = null;
 
-    public void init(){
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
-
-        try {
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(workerGroup).channel(NioSocketChannel.class)
-                    .handler(new LoggingHandler()).handler(new FileClientInitalizer());
-
-            channelFuture = bootstrap.connect(new InetSocketAddress("localhost" , 8899));
-            channelFuture.sync().isSuccess();
-//            channel.closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            workerGroup.shutdownGracefully();
+    public static void sendmsg(Channel channel) throws Exception {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        for(;;){
+            String filePath = bufferedReader.readLine();
+            sendFileWithHttp(filePath , "localhost:8899" , channel);
         }
     }
 
-    public void sendmsg(Channel channel) throws HttpPostRequestEncoder.ErrorDataEncoderException, InterruptedException, IOException {
-        //            future.channel().closeFuture().sync();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-//        for(;;){
-            String filePath = bufferedReader.readLine();
-            sendFileWithHttp(filePath , "localhost:8899" , channel);
-//        }
-    }
-
-    public void sendFileWithHttp(String filePath , String uri , Channel channel) throws HttpPostRequestEncoder.ErrorDataEncoderException, InterruptedException {
+    public static void sendFileWithHttp(String filePath , String uri , Channel channel) throws Exception {
         //D:\others\configserver\config\application.properties
         //F:\developTools\proj\netty-demo\clientFiles\16-9.mp4
+//        channel.connect(new InetSocketAddress("localhost" , 8899)).sync();
         System.out.println("准备传输文件：" + channel.remoteAddress());
         File file = new File(filePath);
         if(!file.exists()){
@@ -75,32 +55,38 @@ public class FileClient {
         String[] filePaths = filePath.split("/");
         String fileName = filePaths[filePaths.length - 1];
         HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
-        HttpPostRequestEncoder postRequestEncoder = new HttpPostRequestEncoder(request , true);
-        postRequestEncoder.addBodyFileUpload("file" , fileName , file , "application/octet-stream" , false);
-        postRequestEncoder.finalizeRequest();
-        ChannelFuture future = channel.writeAndFlush(request);
-        System.out.println(future.await().isDone());
+//        HttpHeaders headers = request.headers();
+//        headers.set(HttpHeaderNames.HOST, "localhost");
+//        headers.set(HttpHeaderNames.CONTENT_LENGTH , 0);
+//        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+//        headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP + "," + HttpHeaderValues.DEFLATE);
+//        headers.set(HttpHeaderNames.ACCEPT_CHARSET, "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
+//        headers.set(HttpHeaderNames.ACCEPT_LANGUAGE, "fr");
+//        headers.set(HttpHeaderNames.USER_AGENT, "Netty Simple Http Client side");
+//        headers.set(HttpHeaderNames.ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+//        HttpPostRequestEncoder postRequestEncoder = new HttpPostRequestEncoder(request , true);
+//        postRequestEncoder.addBodyFileUpload("file" , fileName , file , "application/octet-stream" , false);
+//        postRequestEncoder.finalizeRequest();
+        channel.write(request);
+        ChannelFuture future = channel.write(request);
+        channel.flush();
 //        channel.write(postRequestEncoder);
 //        channel.flush();
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        FileClient fileClient = new FileClient();
-        fileClient.init();
-//        FileClient.init();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    fileClient.sendmsg(fileClient.channelFuture.channel());
-//                } catch (HttpPostRequestEncoder.ErrorDataEncoderException e) {
-//                    e.printStackTrace();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
+    public static void main(String[] args) throws Exception {
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        try {
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(workerGroup).channel(NioSocketChannel.class)
+                    .handler(new LoggingHandler()).handler(new FileClientInitalizer())
+            .option(ChannelOption.SO_KEEPALIVE,true);
+
+            ChannelFuture channelFuture = bootstrap.connect(new InetSocketAddress("localhost" , 8899)).sync();
+            sendmsg(channelFuture.channel());
+        } finally {
+            workerGroup.shutdownGracefully();
+        }
     }
 }

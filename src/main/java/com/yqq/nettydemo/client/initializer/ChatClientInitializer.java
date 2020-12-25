@@ -22,7 +22,7 @@ public class ChatClientInitializer extends ChannelInitializer<SocketChannel> {
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         ChannelPipeline pipeline = socketChannel.pipeline();
 
-        pipeline.addLast(new DelimiterBasedFrameDecoder(4096 , Delimiters.lineDelimiter()));
+//        pipeline.addLast(new DelimiterBasedFrameDecoder(4096 , Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder(CharsetUtil.UTF_8));
         pipeline.addLast(new StringEncoder(CharsetUtil.UTF_8));
         pipeline.addLast(new ChatClientHandler());

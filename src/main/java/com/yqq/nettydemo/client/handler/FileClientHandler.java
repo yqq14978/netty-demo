@@ -17,7 +17,7 @@ import io.netty.util.CharsetUtil;
 public class FileClientHandler extends SimpleChannelInboundHandler<HttpObject> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
-        System.out.println("接收客户端消息");
+        System.out.println("接收客户端消息:"+msg);
         if(msg instanceof HttpResponse){
             HttpResponse response = (HttpResponse) msg;
             System.out.println(response.status().code());

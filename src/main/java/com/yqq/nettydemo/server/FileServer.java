@@ -3,6 +3,7 @@ package com.yqq.nettydemo.server;
 import com.yqq.nettydemo.server.initializer.FileServerInitalizer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
@@ -23,9 +24,11 @@ public class FileServer {
 
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup , workerGroup).channel(NioServerSocketChannel.class)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new FileServerInitalizer());
+            serverBootstrap.group(bossGroup , workerGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .handler(new LoggingHandler(LogLevel.DEBUG))
+                    .childHandler(new FileServerInitalizer())
+            .childOption(ChannelOption.SO_KEEPALIVE,true);
 
             ChannelFuture future = serverBootstrap.bind(8899).sync();
             future.channel().closeFuture().sync();

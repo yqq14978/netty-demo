@@ -34,6 +34,12 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     }
 
     @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        System.out.println("channelRead");
+        super.channelRead(ctx, msg);
+    }
+
+    @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         System.out.println("handler已加入：" + ctx.channel().remoteAddress());
     }
@@ -59,9 +65,11 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 postRequestDecoder = new HttpPostRequestDecoder(request);
             }
             ByteBuf buffer = Unpooled.copiedBuffer("已接收到文件上传请求" , CharsetUtil.UTF_8);
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
-            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
+            HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
+//            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
+//            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
+//            response.headers().set(HttpHeaderNames.CONNECTION , HttpHeaderValues.KEEP_ALIVE);
+
             ctx.writeAndFlush(response);
         } else
             //对后续的数据块进行处理
@@ -78,7 +86,15 @@ public class FileServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 postRequestDecoder.destroy();
                 postRequestDecoder = null;
             }
-        }
+            ByteBuf buffer = Unpooled.copiedBuffer("已接收到文件上传请求" , CharsetUtil.UTF_8);
+            HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1 , HttpResponseStatus.OK , buffer);
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE , "text/plain");
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH , buffer.readableBytes());
+            response.headers().set(HttpHeaderNames.CONNECTION , HttpHeaderValues.KEEP_ALIVE);
+            ctx.writeAndFlush(response);
+
+
+            }
 
     }
 
