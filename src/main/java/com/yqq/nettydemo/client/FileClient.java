@@ -68,6 +68,7 @@ public class FileClient {
 //        channel.write(request);
         channel.write(request);
         channel.write(postRequestEncoder);
+        //HttpPostRequestEncoder会主动添加EMPTY_LAST_CONTENT，所以不需要额外发送
 //        channel.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         channel.flush();
     }
