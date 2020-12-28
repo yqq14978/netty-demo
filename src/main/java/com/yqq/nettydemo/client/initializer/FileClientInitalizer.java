@@ -26,7 +26,7 @@ public class FileClientInitalizer extends ChannelInitializer<SocketChannel> {
 //        pipeline.addLast(new HttpObjectAggregator(1024*1024));
         //解压
 //        pipeline.addLast(new HttpContentCompressor());
-//        pipeline.addLast(new ChunkedWriteHandler());
+        pipeline.addLast(new ChunkedWriteHandler());
         pipeline.addLast("handler" , new FileClientHandler());
     }
 }

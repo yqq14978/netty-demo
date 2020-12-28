@@ -27,7 +27,7 @@ public class FileServerInitalizer extends ChannelInitializer<SocketChannel> {
         //聚合器:不加聚合器的情况下，一次http请求默认会分位多次进行发送，第一次是httpRequest，后面多次都是httpContent
 //        channelPipeline.addLast(new HttpObjectAggregator(1024*1024));
 //        channelPipeline.addLast(new HttpContentCompressor());
-//        channelPipeline.addLast(new ChunkedWriteHandler());
+        channelPipeline.addLast(new ChunkedWriteHandler());
         channelPipeline.addLast("handler" , new FileServerHandler());
     }
 }

@@ -52,26 +52,24 @@ public class FileClient {
         }
 //        Map headers = new HashMap<>();
 //        headers.put("file" , file);
-        String[] filePaths = filePath.split("/");
-        String fileName = filePaths[filePaths.length - 1];
         HttpRequest request = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, uri);
-//        HttpHeaders headers = request.headers();
+        HttpHeaders headers = request.headers();
 //        headers.set(HttpHeaderNames.HOST, "localhost");
 //        headers.set(HttpHeaderNames.CONTENT_LENGTH , 0);
-//        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+//        headers.set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
 //        headers.set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP + "," + HttpHeaderValues.DEFLATE);
 //        headers.set(HttpHeaderNames.ACCEPT_CHARSET, "ISO-8859-1,utf-8;q=0.7,*;q=0.7");
 //        headers.set(HttpHeaderNames.ACCEPT_LANGUAGE, "fr");
 //        headers.set(HttpHeaderNames.USER_AGENT, "Netty Simple Http Client side");
 //        headers.set(HttpHeaderNames.ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-//        HttpPostRequestEncoder postRequestEncoder = new HttpPostRequestEncoder(request , true);
-//        postRequestEncoder.addBodyFileUpload("file" , fileName , file , "application/octet-stream" , false);
-//        postRequestEncoder.finalizeRequest();
+        HttpPostRequestEncoder postRequestEncoder = new HttpPostRequestEncoder(request , true);
+        postRequestEncoder.addBodyFileUpload("file" , file.getName() , file , "application/octet-stream" , false);
+        postRequestEncoder.finalizeRequest();
+//        channel.write(request);
         channel.write(request);
-        ChannelFuture future = channel.write(request);
+        channel.write(postRequestEncoder);
+//        channel.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
         channel.flush();
-//        channel.write(postRequestEncoder);
-//        channel.flush();
     }
 
     public static void main(String[] args) throws Exception {
